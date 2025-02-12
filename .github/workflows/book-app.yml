@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: ['main']
   push:
-    branches: ['main'] # Deployment triggers on merge
+    branches: ['main'] # Deploy on push
 
 permissions:
   contents: read
@@ -38,8 +38,8 @@ jobs:
   deploy:
     name: Deploy Application
     runs-on: ubuntu-latest
-    needs: test # This ensures tests pass before deployment
-    if: github.event_name == 'push' # Only deploy on push to main branch
+    needs: test # Ensure tests pass first
+    if: github.event_name == 'push' # Only deploy on push
 
     steps:
       - name: Checkout repository
@@ -50,17 +50,21 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.PRIVATE_KEY }}
 
+      - name: Set SSH Key Permissions
+        run: chmod 600 ~/.ssh/school # Adjust key name if necessary
+
       - name: Add Server to Known Hosts
-        run: ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
+        run: |
+          ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
       
       - name: Test SSH Connection
         run: ssh ubuntu@3.80.19.217 "echo SSH Connection Successful"
-        
+
       - name: Deploy Code via SSH
         run: |
           ssh ubuntu@3.80.19.217 << 'EOF'
             cd fastapi-book-project
             git pull origin main
-            systemctl restart fastapi
+            sudo systemctl restart fastapi
           EOF
-        
