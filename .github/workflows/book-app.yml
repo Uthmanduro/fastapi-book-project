@@ -1,0 +1,52 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ] # Deployment triggers on merge
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-asyncio httpx
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run tests
+      run: pytest
+
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: test  # This ensures tests pass before deployment
+    if: github.event_name == 'push'  # Only deploy on push to main branch
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Deploy FastAPI Application
+      run: |
+        echo "Deploying application..."
+        # Example deployment script (Modify based on your actual deployment)
+        ssh user@server "cd /path/to/app && git pull origin main && systemctl restart fastapi"
