@@ -50,9 +50,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.PRIVATE_KEY }}
 
-      - name: Set SSH Key Permissions
-        run: chmod 600 ~/.ssh/school # Adjust key name if necessary
-
       - name: Add Server to Known Hosts
         run: |
           ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
