@@ -47,11 +47,9 @@ jobs:
 
       - name: Setup SSH Key
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/school
-          chmod 600 ~/.ssh/school
-          ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
-          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          install -m 600 -D /dev/null ~/.ssh/school
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/school
+          ssh-keyscan -H 3.80.19.217 > ~/.ssh/known_hosts
       
       - name: Test SSH Connection
         run: ssh -i ~/.ssh/school ubuntu@3.80.19.217 "echo SSH Connection Successful"
