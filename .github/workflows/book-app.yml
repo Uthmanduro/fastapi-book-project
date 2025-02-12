@@ -45,18 +45,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup SSH Key
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/school
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/school
-          ssh-keyscan -H 3.80.19.217 > ~/.ssh/known_hosts
+      - name: Install SSH Client 🔑
+        uses: webfactory/ssh-agent@v0.4.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add Server to Known Hosts
+        run: ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
       
       - name: Test SSH Connection
-        run: ssh -i ~/.ssh/school ubuntu@3.80.19.217 "echo SSH Connection Successful"
+        run: ssh ubuntu@3.80.19.217 "echo SSH Connection Successful"
         
       - name: Deploy Code via SSH
         run: |
-          ssh -i ~/.ssh/school ubuntu@3.80.19.217 << 'EOF'
+          ssh ubuntu@3.80.19.217 << 'EOF'
             cd fastapi-book-project
             git pull origin main
             systemctl restart fastapi
