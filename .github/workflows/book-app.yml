@@ -63,5 +63,4 @@ jobs:
           ssh ubuntu@3.80.19.217 << 'EOF'
             cd fastapi-book-project
             git pull origin main
-            sudo systemctl restart fastapi
           EOF
