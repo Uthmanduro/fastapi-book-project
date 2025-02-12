@@ -48,7 +48,7 @@ jobs:
       - name: Install SSH Client 🔑
         uses: webfactory/ssh-agent@v0.4.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.PRIVATE_KEY }}
 
       - name: Add Server to Known Hosts
         run: ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
