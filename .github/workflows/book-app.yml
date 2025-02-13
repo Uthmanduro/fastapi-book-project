@@ -40,6 +40,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8
 
+      - name: Syntax Check
+        run: python -m compileall -q .
+
       - name: Lint with Flake8
         run: flake8 .
 
