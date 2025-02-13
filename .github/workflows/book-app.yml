@@ -51,11 +51,15 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/school
           chmod 600 ~/.ssh/school
           ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+      - name: Test SSH Connection
+        run: ssh -i ~/.ssh/github_actions ubuntu@3.80.19.217 "echo SSH Connection Successful"
 
       - name: Deploy code via SSH
         run: |
           ssh -i ~/.ssh/school ubuntu@3.80.19.217 << 'EOF'
             cd fastapi-book-project
             git pull origin main
-            systemctl restart my-fastapi-app
+            systemctl restart fastapi
           EOF
