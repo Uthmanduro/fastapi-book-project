@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: ['main']
   push:
-    branches: ['main'] # Deployment triggers on merge
+    branches: ['main'] # Deploy on push
 
 permissions:
   contents: read
@@ -38,28 +38,30 @@ jobs:
   deploy:
     name: Deploy Application
     runs-on: ubuntu-latest
-    needs: test # This ensures tests pass before deployment
-    if: github.event_name == 'push' # Only deploy on push to main branch
+    needs: test # Ensure tests pass first
+    if: github.event_name == 'push' # Only deploy on push
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup SSH Key
+      - name: Install SSH Client 🔑
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Add Server to Known Hosts
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/school
-          chmod 600 ~/.ssh/school
           ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
       - name: Test SSH Connection
-        run: ssh -i ~/.ssh/github_actions ubuntu@3.80.19.217 "echo SSH Connection Successful"
+        run: ssh ubuntu@3.80.19.217 "echo SSH Connection Successful"
 
-      - name: Deploy code via SSH
+      - name: Deploy Code via SSH
         run: |
-          ssh -i ~/.ssh/school ubuntu@3.80.19.217 << 'EOF'
+          ssh ubuntu@3.80.19.217 << 'EOF'
             cd fastapi-book-project
             git pull origin main
-            systemctl restart fastapi
+            sudo systemctl restart fastapi
           EOF
