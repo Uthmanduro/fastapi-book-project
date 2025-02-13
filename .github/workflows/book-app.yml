@@ -35,6 +35,17 @@ jobs:
       - name: Run tests
         run: pytest
 
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Syntax Check
+        run: python -m compileall -q .
+
+      - name: Lint with Flake8
+        run: flake8 .
+
   deploy:
     name: Deploy Application
     runs-on: ubuntu-latest
@@ -54,7 +65,7 @@ jobs:
         run: |
           ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
-          
+
       - name: Test SSH Connection
         run: ssh ubuntu@3.80.19.217 "echo SSH Connection Successful"
 
