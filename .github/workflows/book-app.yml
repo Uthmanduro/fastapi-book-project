@@ -54,7 +54,7 @@ jobs:
         run: |
           ssh-keyscan -H 3.80.19.217 >> ~/.ssh/known_hosts
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
-
+          
       - name: Test SSH Connection
         run: ssh ubuntu@3.80.19.217 "echo SSH Connection Successful"
 
